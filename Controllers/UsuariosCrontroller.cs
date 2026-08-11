@@ -1,10 +1,10 @@
-﻿using API_BackEndMobile.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestauranteTDS03.Data;
 using RestauranteTDS03.Models;
 using RestauranteTDS03.Models.DTOs;
+using RestauranteTDS03.Models.Response;
 using RestauranteTDS03.Service;
 using System.Threading.Tasks;
 
@@ -14,15 +14,15 @@ namespace RestauranteTDS03.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
-        private readonly UsuarioService _usuarioService;
+        private readonly AuthService _authService;
 
-        public UsuariosController(UsuarioService usuarioService)
+        public UsuariosController(AuthService authService)
         {
-            _usuarioService = usuarioService;
+            _authService = authService;
         }
 
         [HttpPost("CriarUsuario")]
-        public async Task<ActionResult<Usuario>> CriarUsuario(AuthDTO dto)
+        public async Task<ActionResult<Usuario>> CriarUsuario([FromBody] CadastroDTO dadosCadastro)
         {
             if (!ModelState.IsValid)
             {
@@ -31,15 +31,21 @@ namespace RestauranteTDS03.Controllers
 
             Usuario usuarios = new Usuario
             {
-                Nome = dto.Nome,
-                NomeUsuario = dto.NomeUsuario,
-                Email = dto.Email,
-                Telefone = dto.Telefone,
-                Senha = (dto.Senha),
-                ImagemUrl = dto.ImagemUrl
+                Nome = dadosCadastro.Nome,
+                NomeUsuario = dadosCadastro.NomeUsuario,
+                Email = dadosCadastro.Email,
+                Telefone = dadosCadastro.Telefone,
+                Senha = (dadosCadastro.Senha),
+                ImagemUrl = dadosCadastro.ImagemUrl
             };
 
-            await _usuarioService.CriarUsuario(usuarios);
+            var response = await _authService.CadastrarUsuarioAsync(dadosCadastro);
+
+            // Se o serviço acusar erro (ex: email já existe)
+            if (response.Erro)
+            {
+                return BadRequest(response);
+            }
 
             return CreatedAtAction(nameof(CriarUsuario), new { id = usuarios.Id }, new
             {
@@ -47,6 +53,24 @@ namespace RestauranteTDS03.Controllers
                 Nome = usuarios.Nome
             });
         }
-    }
 
+        [HttpPost("Login")]
+        public async Task<IActionResult> LoginAsync([FromBody] LoginDTO dadosLogin)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Chama o serviço de autenticação para realizar o login
+            ResponseLogin response = await _authService.LoginAsync(dadosLogin);
+
+            if (response.Erro)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
+        }
+    }
 }

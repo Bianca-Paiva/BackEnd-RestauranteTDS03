@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API_BackEndMobile.Models
+namespace RestauranteTDS03.Models
 {
     [Table("TB_USUARIOS")]
     public class Usuario

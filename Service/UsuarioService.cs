@@ -1,4 +1,4 @@
-﻿using API_BackEndMobile.Models;
+﻿using RestauranteTDS03.Models;
 using RestauranteTDS03.Data;
 
 namespace RestauranteTDS03.Service
@@ -19,6 +19,5 @@ namespace RestauranteTDS03.Service
             await _context.SaveChangesAsync();
             return usuario;
         }
-
     }
 }

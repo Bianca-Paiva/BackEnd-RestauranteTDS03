@@ -21,7 +21,21 @@ namespace RestauranteTDS03
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<UsuarioService>();
+            builder.Services.AddScoped<AuthService>();
             builder.Services.AddControllers();
+
+
+            // CONFIGURAÇÃO DO CORS (Para aceitar chamadas do React Native)
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("PermitirTudo", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
 
             var app = builder.Build();
 
@@ -32,7 +46,10 @@ namespace RestauranteTDS03
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
+
+            // Habilitar o CORS
+            app.UseCors("PermitirTudo");
 
             app.UseAuthorization();
 
