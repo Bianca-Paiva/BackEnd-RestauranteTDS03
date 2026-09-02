@@ -51,6 +51,9 @@ namespace RestauranteTDS03
             // Habilitar o CORS
             app.UseCors("PermitirTudo");
 
+            // --- 3. HABILITAR ARQUIVOS ESTÁTICOS (FOTOS DE PERFIL E MÍDIA)
+            app.UseStaticFiles();
+
             app.UseAuthorization();
 
             app.MapControllers();
